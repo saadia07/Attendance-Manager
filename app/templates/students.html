@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Students - Attendance App{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Add student</h5>
+        <form method="post">
+          {{ form.hidden_tag() }}
+
+          <div class="mb-3">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control", placeholder="Student full name") }}
+            {% for err in form.name.errors %}
+              <div class="text-danger small">{{ err }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.roll_no.label(class="form-label") }}
+            {{ form.roll_no(class="form-control", placeholder="Roll number (optional)") }}
+            {% for err in form.roll_no.errors %}
+              <div class="text-danger small">{{ err }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.class_id.label(class="form-label") }}
+            {{ form.class_id(class="form-select") }}
+            {% for err in form.class_id.errors %}
+              <div class="text-danger small">{{ err }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="d-grid">
+            {{ form.submit(class="btn btn-primary") }}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <h5>Students</h5>
+    {% if students %}
+      <table class="table table-hover">
+        <thead><tr><th>#</th><th>Roll</th><th>Name</th><th>Class</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for s in students %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ s.roll_no or '-' }}</td>
+              <td>{{ s.name }}</td>
+              <td>{{ s.classroom.name }}</td>
+              <td>
+                <a class="btn btn-sm btn-outline-danger" href="{{ url_for('main.student_delete', student_id=s.id) }}" onclick="return confirm('Delete this student?');">Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="alert alert-info">No students yet. Add one on the left.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

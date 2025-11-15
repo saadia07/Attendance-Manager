@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Attendance App{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Your classes</h2>
+  <a href="{{ url_for('main.classes_view') }}" class="btn btn-outline-primary btn-sm">Manage classes</a>
+</div>
+
+{% if classes %}
+  <div class="row">
+    {% for c in classes %}
+      <div class="col-md-4">
+        <div class="card mb-3 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">{{ c.name }}</h5>
+            <p class="card-text small">ID: {{ c.id }}</p>
+
+            <a href="{{ url_for('main.mark_attendance', class_id=c.id) }}" class="btn btn-success btn-sm">Mark Attendance</a>
+            <a href="{{ url_for('main.students_view') }}?class_id={{ c.id }}" class="btn btn-secondary btn-sm">View Students</a>
+            <a href="{{ url_for('main.reports') }}?class_id={{ c.id }}" class="btn btn-outline-primary btn-sm">Reports</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">You don't have any classes yet. <a href="{{ url_for('main.classes_view') }}" class="alert-link">Create one now</a>.</div>
+{% endif %}
+{% endblock %}

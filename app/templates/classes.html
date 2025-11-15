@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Classes - Attendance App{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Add a class</h5>
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control", placeholder="Class name (e.g. 10-A / Physics)") }}
+            {% for err in form.name.errors %}
+              <div class="text-danger small">{{ err }}</div>
+            {% endfor %}
+          </div>
+          <div class="d-grid">
+            {{ form.submit(class="btn btn-primary") }}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <h5>My classes</h5>
+    {% if classes %}
+      <table class="table table-striped">
+        <thead><tr><th>#</th><th>Name</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for cls in classes %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ cls.name }}</td>
+              <td>
+                <a class="btn btn-sm btn-success" href="{{ url_for('main.mark_attendance', class_id=cls.id) }}">Mark Attendance</a>
+                <a class="btn btn-sm btn-secondary" href="{{ url_for('main.students_view') }}?class_id={{ cls.id }}">Students</a>
+                <a class="btn btn-sm btn-outline-danger" href="{{ url_for('main.class_delete', class_id=cls.id) }}" onclick="return confirm('Delete this class? This will remove students and attendance tied to it.');">Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="alert alert-info">No classes yet. Add one on the left.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

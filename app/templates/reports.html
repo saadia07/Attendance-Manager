@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Reports - Attendance App{% endblock %}
+{% block content %}
+<h3>Attendance Reports</h3>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="get" class="row gy-2 gx-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Class</label>
+          <select name="class_id" class="form-select">
+            <option value="">All classes</option>
+            {% for c in classes %}
+              <option value="{{ c.id }}" {% if class_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label">View</label>
+        <select name="view" class="form-select" onchange="toggleInputs()">
+          <option value="daily" {% if view == 'daily' %}selected{% endif %}>Daily</option>
+          <option value="monthly" {% if view == 'monthly' %}selected{% endif %}>Monthly</option>
+          <option value="yearly" {% if view == 'yearly' %}selected{% endif %}>Yearly</option>
+        </select>
+      </div>
+
+      <div id="daily-input" class="col-md-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" class="form-control" value="{{ date_str }}">
+      </div>
+
+      <div id="monthly-input" class="col-md-2" style="display: none;">
+        <label class="form-label">Month</label>
+        <input type="number" name="month" min="1" max="12" class="form-control" placeholder="MM" value="{{ month }}">
+      </div>
+
+      <!-- Year input used by both monthly and yearly -->
+      <div id="year-input" class="col-md-2" style="display: none;">
+        <label class="form-label">Year</label>
+        <input type="number" name="year" min="2000" max="2100" class="form-control" placeholder="YYYY" value="{{ year }}">
+      </div>
+
+      <div class="col-md-2">
+        <button class="btn btn-primary">Show</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function toggleInputs(){
+    const v = document.querySelector('select[name="view"]').value;
+    document.getElementById('daily-input').style.display = v === 'daily' ? 'block' : 'none';
+    document.getElementById('monthly-input').style.display = v === 'monthly' ? 'block' : 'none';
+    // show year input when monthly OR yearly
+    document.getElementById('year-input').style.display = (v === 'monthly' || v === 'yearly') ? 'block' : 'none';
+  }
+  // run on load
+  window.addEventListener('DOMContentLoaded', function(){ toggleInputs(); });
+</script>
+
+<hr>
+
+<div>
+  {% if view == 'daily' %}
+    <h5>Daily report</h5>
+    {% if results %}
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for name, status in results %}
+            <tr>
+              <td>{{ name }}</td>
+              <td>{{ status }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="alert alert-warning">No records found for selected date/class.</div>
+    {% endif %}
+
+  {% elif view == 'monthly' %}
+    <h5>Monthly report</h5>
+    {% if results %}
+      <table class="table table-sm table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Student</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dt, name, status in results %}
+            <tr>
+              <td>{{ dt }}</td>
+              <td>{{ name }}</td>
+              <td>{{ status }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="alert alert-warning">No records for that month/class.</div>
+    {% endif %}
+
+  {% elif view == 'yearly' %}
+    <h5>Yearly summary</h5>
+    {% if results %}
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Present</th>
+            <th>Total</th>
+            <th>Percent</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for name, present_count, total in results %}
+            <tr>
+              <td>{{ name }}</td>
+              <td>{{ present_count }}</td>
+              <td>{{ total }}</td>
+              <td>
+                {% if total and total != 0 %}
+                  {{ ('%.1f' % ((present_count/total)*100)) }}%
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="alert alert-warning">No yearly data found.</div>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

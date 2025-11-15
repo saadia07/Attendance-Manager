@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Mark Attendance - {{ class_obj.name }}</h3>
+<form method="post">
+  {{ form.hidden_tag() }}
+  <div class="mb-3">
+    {{ form.date.label }} {{ form.date(class="form-control", value=form.date.data|string) }}
+  </div>
+
+  <table class="table">
+    <thead><tr><th>Roll</th><th>Name</th><th>Present</th></tr></thead>
+    <tbody>
+      {% for student in students %}
+      <tr>
+        <td>{{ student.roll_no or '-' }}</td>
+        <td>{{ student.name }}</td>
+        <td>
+          <input type="checkbox" name="present-{{ student.id }}" {% if att_map.get(student.id) == 'present' %}checked{% endif %}>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <button class="btn btn-success">Save</button>
+</form>
+{% endblock %}
